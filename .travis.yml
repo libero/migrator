@@ -1,7 +1,7 @@
 language: node_js
 stages:
-- test
-- deploy
+  - test
+  - deploy
 jobs:
   include:
   - stage: test
