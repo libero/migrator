@@ -1,0 +1,27 @@
+language: node_js
+
+stages:
+  - test
+  - deploy
+jobs:
+  include:
+    - stage: test
+      name: Test
+      node_js:
+        - 10.16.3
+      script: yarn test
+
+    - stage: deploy
+      if:
+        tag IS present
+      name: Deploy
+      script: yarn build
+      node_js:
+        - 10.16.3
+      deploy:
+        provider: npm
+        skip_cleanup: true
+        email: libero-npm@elifesciences.org
+        on:
+          tags: true
+          branch: master
