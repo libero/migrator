@@ -13,8 +13,10 @@ interface MigrationCliOptions {
     migrations: umzug.MigrationOptions;
 }
 
-type makeCommandArguments = yargs.Arguments<yargs.InferredOptionTypes<{ name: { alias: string; demandOption: true; }; }>>;
-type statusCommandArguments = yargs.Arguments<yargs.InferredOptionTypes<{ pending: { alias: string }, executed: { alias: string } }>>;
+type makeCommandArguments = yargs.Arguments<yargs.InferredOptionTypes<{ name: { alias: string; demandOption: true } }>>;
+type statusCommandArguments = yargs.Arguments<
+    yargs.InferredOptionTypes<{ pending: { alias: string }; executed: { alias: string } }>
+>;
 
 export class Cli {
     constructor(readonly options: MigrationCliOptions, readonly commands: Commands = new Commands()) {
@@ -27,16 +29,15 @@ export class Cli {
                 tableName: 'migrations',
             },
             migrations: { ...this.options.migrations, params: [connection] },
-        // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
         this.commands.init(new umzug(umzugOptions), process.stdout);
     }
 
-    public exec() {
+    public exec(): void {
         this.banner();
 
-        // tslint:disable-next-line: no-unused-expression
         yargs
             .version()
             .scriptName(this.options.name)
@@ -55,24 +56,26 @@ export class Cli {
                 'status',
                 'Show status migrations',
                 (argv: yargs.Argv) => {
-                    return argv.option('pending', {
-                        alias: 'p',
-                        describe: 'Pending migrations',
-                        type: 'boolean',
-                    })
-                    .option('executed', {
-                        alias: 'e',
-                        describe: 'Executed migrations',
-                        type: 'boolean',
-                    });
+                    return argv
+                        .option('pending', {
+                            alias: 'p',
+                            describe: 'Pending migrations',
+                            type: 'boolean',
+                        })
+                        .option('executed', {
+                            alias: 'e',
+                            describe: 'Executed migrations',
+                            type: 'boolean',
+                        });
                 },
-                (argv: statusCommandArguments) => this.commandStatus(argv))
+                (argv: statusCommandArguments) => this.commandStatus(argv),
+            )
             .demandCommand()
             .help()
             .parse();
     }
 
-    public banner() {
+    public banner(): void {
         const banner = chalk.white.bold(this.options.banner || '');
 
         const boxenOptions = {
@@ -86,7 +89,7 @@ export class Cli {
         boxen(banner, boxenOptions);
     }
 
-    public async commandRun() {
+    public async commandRun(): Promise<void> {
         try {
             await this.commands.runMigrations();
         } catch (e) {
@@ -96,7 +99,7 @@ export class Cli {
         this.finish();
     }
 
-    public commandMake(argv: makeCommandArguments) {
+    public commandMake(argv: makeCommandArguments): void {
         const filePath = this.filePath(argv.name as string);
 
         try {
@@ -108,11 +111,11 @@ export class Cli {
         this.finish();
     }
 
-    public filePath(name: string) {
+    public filePath(name: string): string {
         return join(`${this.options.migrations.path}`, `${Math.floor(new Date().getTime() / 1000)}-${name}.ts`);
     }
 
-    public async commandRollback() {
+    public async commandRollback(): Promise<void> {
         try {
             await this.commands.rollback();
         } catch (e) {
@@ -122,7 +125,7 @@ export class Cli {
         this.finish();
     }
 
-    public async commandStatus(argv: statusCommandArguments) {
+    public async commandStatus(argv: statusCommandArguments): Promise<void> {
         await this.commands.showStatus({
             pending: !!argv.pending,
             executed: !!argv.executed,
@@ -131,7 +134,7 @@ export class Cli {
         this.finish();
     }
 
-    public finish() {
+    public finish(): void {
         process.exit(0);
     }
 }
