@@ -19,7 +19,9 @@ type statusCommandArguments = yargs.Arguments<
 >;
 
 export class Cli {
-    constructor(readonly options: MigrationCliOptions, readonly commands: Commands = new Commands()) {
+    private commands: Commands;
+
+    constructor(readonly options: MigrationCliOptions, commands: Commands | undefined = undefined) {
         const connection = Knex(this.options.knexConfig);
         const umzugOptions = {
             storage: 'knex-umzug',
@@ -32,7 +34,11 @@ export class Cli {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
-        this.commands.init(new umzug(umzugOptions), process.stdout);
+        if (commands === undefined) {
+            this.commands = new Commands(new umzug(umzugOptions), process.stdout);
+        } else {
+            this.commands = commands;
+        }
     }
 
     public exec(): void {

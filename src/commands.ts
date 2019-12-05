@@ -1,34 +1,34 @@
 import * as table from 'borderless-table';
 import { writeFileSync } from 'fs';
 import { EOL } from 'os';
-import { Migration, Umzug } from 'umzug';
 import migrationTemplate from './migration-template';
+import { MigrationTool, Migration, OutputStream } from 'types';
 
 export class Commands {
-    private umzug: Umzug;
-    private stdout: NodeJS.WriteStream;
+    private tool: MigrationTool;
+    private outStream: OutputStream;
 
-    public init(umzug: Umzug, stdout: NodeJS.WriteStream): void {
-        this.umzug = umzug;
-        this.stdout = stdout;
+    public constructor(tool: MigrationTool, outStream: OutputStream) {
+        this.tool = tool;
+        this.outStream = outStream;
     }
 
     public makeMigrationFile(filePath: string): void {
         writeFileSync(filePath, migrationTemplate);
 
-        this.printLn(`Successfuly created migration ${filePath}`);
+        this.printLn(`Successfully created migration ${filePath}`);
     }
 
     public async runMigrations(): Promise<void> {
-        const migrations = await this.umzug.up();
+        const migrations = await this.tool.up();
 
-        this.printMigrations(migrations, 'Successfuly migrated:');
+        this.printMigrations(migrations, 'Successfully migrated:');
     }
 
     public async rollback(): Promise<void> {
-        const migrations = await this.umzug.down();
+        const migrations = await this.tool.down();
 
-        this.printMigrations(migrations, 'Successfuly rolled back:');
+        this.printMigrations(migrations, 'Successfully rolled back:');
     }
 
     public async showStatus({ pending, executed }): Promise<void> {
@@ -37,22 +37,22 @@ export class Commands {
         }
 
         if (pending) {
-            const pendingMigrations = await this.umzug.pending();
+            const pendingMigrations = await this.tool.pending();
             this.printMigrations(pendingMigrations, 'Pending migrations');
         }
 
         if (executed) {
-            const executedMigrations = await this.umzug.executed();
+            const executedMigrations = await this.tool.executed();
             this.printMigrations(executedMigrations, 'Executed migrations');
         }
     }
 
     private printLn(msg = ''): void {
-        this.stdout.write(msg + EOL);
+        this.outStream.write(msg + EOL);
     }
 
     private printMigrations(migrations: Migration[], header: string): void {
-        table(migrations, ['file'], [header], this.stdout);
+        table(migrations, ['file'], [header], this.outStream);
         this.printLn();
     }
 }

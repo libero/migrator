@@ -21,14 +21,26 @@ describe('cli', () => {
                     client: 'sqlite3',
                     useNullAsDefault: true,
                 },
-                migrations: {},
+                migrations: {
+                    path: '/a/path'
+                },
             },
             commands,
         );
     });
 
-    it('command init is called in the cli constructor', () => {
-        expect(commands.init).toHaveBeenCalledTimes(1);
+    it('generates unique filenames over 1 second', (done) => {
+        const thing1: string = cli.filePath('thing1');
+        let thing2: string;
+        setTimeout(() => {
+            thing2 = cli.filePath('thing1');
+            expect(thing1).not.toBe(thing2);
+            expect(thing1.startsWith('/a/path')).toBe(true);
+            expect(thing2.startsWith('/a/path')).toBe(true);
+            expect(thing1).toContain('thing1');
+            expect(thing2).toContain('thing1');
+            done();
+        }, 1000);
     });
 
     it('runs migrations', () => {
