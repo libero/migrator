@@ -4,7 +4,7 @@ describe('WritableMemoryStream', () => {
     it('initialises as empty', () => {
         const wms = new WritableMemoryStream();
         expect(wms.get()).toBe('');
-    })
+    });
 
     it('can be written to', () => {
         const wms = new WritableMemoryStream();
@@ -12,5 +12,5 @@ describe('WritableMemoryStream', () => {
         wms.write('two');
         wms.end();
         expect(wms.get()).toBe('one,two');
-    })
+    });
 });

@@ -22,14 +22,14 @@ describe('cli', () => {
                     useNullAsDefault: true,
                 },
                 migrations: {
-                    path: '/a/path'
+                    path: '/a/path',
                 },
             },
             commands,
         );
     });
 
-    it('generates unique filenames over 1 second', (done) => {
+    it('generates unique filenames over 1 second', done => {
         const thing1: string = cli.filePath('thing1');
         let thing2: string;
         setTimeout(() => {
