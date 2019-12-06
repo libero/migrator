@@ -6,11 +6,14 @@ import * as Knex from 'knex';
 import { join } from 'path';
 import { Commands } from './commands';
 
+type UmzugOptions = umzug.UmzugOptions;
+type MigrationOptions = umzug.MigrationOptions;
+
 interface MigrationCliOptions {
     banner?: string;
     name: string;
     knexConfig: Knex.Config;
-    migrations: umzug.MigrationOptions;
+    migrations: MigrationOptions;
 }
 
 type makeCommandArguments = yargs.Arguments<yargs.InferredOptionTypes<{ name: { alias: string; demandOption: true } }>>;
@@ -23,7 +26,7 @@ export class Cli {
 
     constructor(readonly options: MigrationCliOptions, commands: Commands | undefined) {
         const connection = Knex(this.options.knexConfig);
-        const umzugOptions: unknown = {
+        const umzugOptions: UmzugOptions = ({
             storage: 'knex-umzug',
             storageOptions: {
                 context: 'default',
@@ -33,11 +36,10 @@ export class Cli {
             migrations: { ...this.options.migrations, params: [connection] },
             // This cannot be of type UmzugOptions as its from `knex-umzug`
             // which doesn't have the correct type.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as unknown;
+        } as unknown) as UmzugOptions;
 
         if (commands === undefined) {
-            this.commands = new Commands(new umzug(umzugOptions as umzug.UmzugOptions), process.stdout);
+            this.commands = new Commands(new umzug(umzugOptions), process.stdout);
         } else {
             this.commands = commands;
         }
