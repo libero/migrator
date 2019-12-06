@@ -2,7 +2,7 @@ import * as table from 'borderless-table';
 import { writeFileSync } from 'fs';
 import { EOL } from 'os';
 import migrationTemplate from './migration-template';
-import { MigrationTool, Migration, OutputStream } from 'types';
+import { MigrationTool, Migration, OutputStream } from './types';
 
 export class Commands {
     private tool: MigrationTool;
