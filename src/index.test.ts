@@ -11,7 +11,8 @@ describe('cli', () => {
             runMigrations: jest.fn(),
             rollback: jest.fn(),
             makeMigrationFile: jest.fn(),
-            showStatus: jest.fn(),
+            showPendingStatus: jest.fn(),
+            showExecutedStatus: jest.fn(),
         } as unknown) as Commands;
 
         cli = new Cli(
@@ -70,7 +71,7 @@ describe('cli', () => {
         cli.finish = jest.fn();
         cli.commandStatus({ _: ['status'], $0: 'example-cli', pending: true, executed: false });
 
-        expect(commands.showStatus).toHaveBeenCalledTimes(1);
-        expect(commands.showStatus).toHaveBeenCalledWith({ pending: true, executed: false });
+        expect(commands.showPendingStatus).toHaveBeenCalledTimes(1);
+        expect(commands.showExecutedStatus).toHaveBeenCalledTimes(0);
     });
 });

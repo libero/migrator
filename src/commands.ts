@@ -31,20 +31,14 @@ export class Commands {
         this.printMigrations(migrations, 'Successfully rolled back:');
     }
 
-    public async showStatus({ pending, executed }): Promise<void> {
-        if (!pending && !executed) {
-            pending = executed = true;
-        }
+    public async showPendingStatus(): Promise<void> {
+        const pendingMigrations: Migration[] = await this.tool.pending();
+        this.printMigrations(pendingMigrations, 'Pending migrations');
+    }
 
-        if (pending) {
-            const pendingMigrations: Migration[] = await this.tool.pending();
-            this.printMigrations(pendingMigrations, 'Pending migrations');
-        }
-
-        if (executed) {
-            const executedMigrations: Migration[] = await this.tool.executed();
-            this.printMigrations(executedMigrations, 'Executed migrations');
-        }
+    public async showExecutedStatus(): Promise<void> {
+        const executedMigrations: Migration[] = await this.tool.executed();
+        this.printMigrations(executedMigrations, 'Executed migrations');
     }
 
     private printLn(msg = ''): void {

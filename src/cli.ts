@@ -134,10 +134,12 @@ export class Cli {
     }
 
     public async commandStatus(argv: statusCommandArguments): Promise<void> {
-        await this.commands.showStatus({
-            pending: !!argv.pending,
-            executed: !!argv.executed,
-        });
+        if (argv.pending) {
+            await this.commands.showPendingStatus();
+        }
+        if (argv.executed) {
+            await this.commands.showExecutedStatus();
+        }
 
         this.finish();
     }

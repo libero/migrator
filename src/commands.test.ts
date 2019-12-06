@@ -43,24 +43,25 @@ describe('Commands class', () => {
         expect(outStream.get()).toContain('Successfully rolled back:');
     });
 
-    it('showStatus - both', async () => {
-        await cmd.showStatus({ pending: true, executed: true });
+    it('show both statuses', async () => {
+        await cmd.showPendingStatus();
+        await cmd.showExecutedStatus();
         outStream.end();
 
         expect(outStream.get()).toContain('Pending migrations');
         expect(outStream.get()).toContain('Executed migrations');
     });
 
-    it('showStatus - only pending', async () => {
-        await cmd.showStatus({ pending: true, executed: false });
+    it('showPendingStatus', async () => {
+        await cmd.showPendingStatus();
         outStream.end();
 
         expect(outStream.get()).toContain('Pending migrations');
         expect(outStream.get()).not.toContain('Executed migrations');
     });
 
-    it('showStatus - only executed', async () => {
-        await cmd.showStatus({ pending: false, executed: true });
+    it('showExecutedStatus', async () => {
+        await cmd.showExecutedStatus();
         outStream.end();
 
         expect(outStream.get()).not.toContain('Pending migrations');
