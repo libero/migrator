@@ -13,13 +13,13 @@ export class MockTool implements MigrationTool {
         return Promise.resolve([]);
     }
 
-    up(migration?: string | undefined): Promise<Migration[]> {
+    up(migration?: string): Promise<Migration[]> {
         this.commands.push('up');
         this.commands.push(migration ? migration : '<missing>');
         return Promise.resolve([]);
     }
 
-    down(migration?: string | undefined): Promise<Migration[]> {
+    down(migration?: string): Promise<Migration[]> {
         this.commands.push('down');
         this.commands.push(migration ? migration : '<missing>');
         return Promise.resolve([]);

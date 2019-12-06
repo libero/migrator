@@ -21,9 +21,9 @@ type statusCommandArguments = yargs.Arguments<
 export class Cli {
     private commands: Commands;
 
-    constructor(readonly options: MigrationCliOptions, commands: Commands | undefined = undefined) {
+    constructor(readonly options: MigrationCliOptions, commands: Commands | undefined) {
         const connection = Knex(this.options.knexConfig);
-        const umzugOptions = {
+        const umzugOptions: unknown = {
             storage: 'knex-umzug',
             storageOptions: {
                 context: 'default',
@@ -31,11 +31,13 @@ export class Cli {
                 tableName: 'migrations',
             },
             migrations: { ...this.options.migrations, params: [connection] },
+            // This cannot be of type UmzugOptions as its from `knex-umzug`
+            // which doesn't have the correct type.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
+        } as unknown;
 
         if (commands === undefined) {
-            this.commands = new Commands(new umzug(umzugOptions), process.stdout);
+            this.commands = new Commands(new umzug(umzugOptions as umzug.UmzugOptions), process.stdout);
         } else {
             this.commands = commands;
         }
