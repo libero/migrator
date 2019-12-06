@@ -20,13 +20,13 @@ export class Commands {
     }
 
     public async runMigrations(): Promise<void> {
-        const migrations = await this.tool.up();
+        const migrations: Migration[] = await this.tool.up();
 
         this.printMigrations(migrations, 'Successfully migrated:');
     }
 
     public async rollback(): Promise<void> {
-        const migrations = await this.tool.down();
+        const migrations: Migration[] = await this.tool.down();
 
         this.printMigrations(migrations, 'Successfully rolled back:');
     }
@@ -37,12 +37,12 @@ export class Commands {
         }
 
         if (pending) {
-            const pendingMigrations = await this.tool.pending();
+            const pendingMigrations: Migration[] = await this.tool.pending();
             this.printMigrations(pendingMigrations, 'Pending migrations');
         }
 
         if (executed) {
-            const executedMigrations = await this.tool.executed();
+            const executedMigrations: Migration[] = await this.tool.executed();
             this.printMigrations(executedMigrations, 'Executed migrations');
         }
     }
