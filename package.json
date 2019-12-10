@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@types/jest": "^24.0.19",
+    "@types/umzug": "^2.2.2",
     "@types/node": "^12.11.1",
     "borderless-table": "^2.0.0",
     "boxen": "^4.1.0",
@@ -35,7 +36,6 @@
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "@types/umzug": "^2.2.2",
     "@typescript-eslint/eslint-plugin": "^2.8.0",
     "@typescript-eslint/parser": "^2.8.0",
     "eslint": "^6.6.0",

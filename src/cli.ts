@@ -6,11 +6,14 @@ import * as Knex from 'knex';
 import { join } from 'path';
 import { Commands } from './commands';
 
+type UmzugOptions = umzug.UmzugOptions;
+type MigrationOptions = umzug.MigrationOptions;
+
 interface MigrationCliOptions {
     banner?: string;
     name: string;
     knexConfig: Knex.Config;
-    migrations: umzug.MigrationOptions;
+    migrations: MigrationOptions;
 }
 
 type makeCommandArguments = yargs.Arguments<yargs.InferredOptionTypes<{ name: { alias: string; demandOption: true } }>>;
@@ -19,9 +22,11 @@ type statusCommandArguments = yargs.Arguments<
 >;
 
 export class Cli {
-    constructor(readonly options: MigrationCliOptions, readonly commands: Commands = new Commands()) {
+    private commands: Commands;
+
+    constructor(readonly options: MigrationCliOptions, commands: Commands | undefined) {
         const connection = Knex(this.options.knexConfig);
-        const umzugOptions = {
+        const umzugOptions: UmzugOptions = ({
             storage: 'knex-umzug',
             storageOptions: {
                 context: 'default',
@@ -29,10 +34,15 @@ export class Cli {
                 tableName: 'migrations',
             },
             migrations: { ...this.options.migrations, params: [connection] },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
+            // This cannot be of type UmzugOptions as its from `knex-umzug`
+            // which doesn't have the correct type.
+        } as unknown) as UmzugOptions;
 
-        this.commands.init(new umzug(umzugOptions), process.stdout);
+        if (commands === undefined) {
+            this.commands = new Commands(new umzug(umzugOptions), process.stdout);
+        } else {
+            this.commands = commands;
+        }
     }
 
     public exec(): void {
@@ -126,10 +136,12 @@ export class Cli {
     }
 
     public async commandStatus(argv: statusCommandArguments): Promise<void> {
-        await this.commands.showStatus({
-            pending: !!argv.pending,
-            executed: !!argv.executed,
-        });
+        if (argv.pending) {
+            await this.commands.showPendingStatus();
+        }
+        if (argv.executed) {
+            await this.commands.showExecutedStatus();
+        }
 
         this.finish();
     }
