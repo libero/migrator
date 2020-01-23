@@ -20,7 +20,7 @@ describe('Commands class', () => {
         cmd.makeMigrationFile(filename);
         expect(outStream.get()).toBe(`Successfully created migration ${filename}\n`);
         expect(tool.commands).toHaveLength(0);
-        expect(statSync(filename).size).toBe(158);
+        expect(statSync(filename).size).toBe(198);
     });
 
     it('runMigrations', async () => {
